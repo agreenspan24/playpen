@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Countdown Snooze</title>
+<style>
+	body {
+		text-align: center;
+		background-color: #404040;
+		color: #ffffff;
+		font-size: 20px;
+	}
+	h1 {
+		text-shadow: 3px 2px #008000;
+	}
+	label {
+		font-weight: bold;
+	}
+	input {
+		text-align: center;
+		border: 3px solid green;
+	}
+	#clock {
+		color: #00cd00;
+		font-size: 160px;
+	}
+	.green {
+		color: #00cd00;
+	}
+	#Snooze {
+		height: 50px;
+		width: 150px;
+		font-size: 30px;
+		background-color: green;
+		color: white;
+	}
+	#off {
+		height: 50px;
+		width: 150px;
+		font-size: 30px;
+		color: green;
+	}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+</head>
+
+<body>
+<h1>Countdown Snooze</h1>
+
+<div id="form">
+<label for="time">Alarm Time</label><br>
+<input id="time" type="time"><br><br>
+
+<label for="start">Length of First Snooze</label><br>
+<input type="text" id="start" placeholder="In Minutes" name="start"><br><br>
+
+<label for="rate">Rate of Decrease of Snooze Time</label><br>
+<input type="text" id="rate" placeholder="In Minutes" name="rate"><br><br>
+
+<input type="submit" id="submit" value="Submit">
+<input type="reset" id="reset" onclick="Reset()" value="Reset">
+</div>
+
+<div id="clock"></div><br>
+
+<div id="txt"></div><br>
+
+<div id="btns">
+<button onclick="Pause()" id="Snooze" type="button">Snooze</button>
+<button onclick="off()" id="off" type="button">Off</button>
+</div>
+
+<audio id="alarmSound" loop>
+ <source src="Xylophone.mp3" type="audio/mpeg">
+</audio>
+
+
+<script>
+$("#btns").hide();
+
+var aud = document.getElementById("alarmSound");
+var awake = false;
+
+$('#submit').click(function(e){
+	$('#form').hide();
+
+	var time = $('#time').val();
+	var start = $('#start').val();
+	var rate = $('#rate').val();
+
+	var nxtSnz = start*60000;
+	var r = rate*60000;
+
+	$("#txt").html("Your alarm is set for <span class='green'>"+time+"</span>.<br><br>Your first snooze will last for <span class='green'>"+start+"</span> minute(s) and decrease by <span class='green'>"+rate+"</span> minute(s) every snooze.<br><br>");
+
+	startTime();
+
+	function startTime() {
+	    var today = new Date();
+	    var h = today.getHours();
+	    var m = today.getMinutes();
+	    m = checkTime(m);
+	    curTime = h + ":" + m;
+	   	$("#clock").html(curTime);
+
+	   	if (curTime == time){
+	   		$("#btns").show();
+	   		aud.play();
+	   		time = undefined;
+	   		aud.onpause = function() {
+	   			if (awake) return;
+	   			var x = setTimeout(function(){
+	   				$('#Snooze').show();
+	   				aud.play();
+	   			}, nxtSnz);
+	   			nxtSnz -= r;
+	   			if (nxtSnz<1000) {
+	   				return;
+	   			}
+	   		}
+	   	} 
+	    var t = setTimeout(startTime, 1000);
+	}
+	function checkTime(i) {
+	    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+	    return i;
+	}
+});
+
+function Pause() {
+	aud.pause();
+	$('#Snooze').hide();	
+}
+function off() {
+	Pause();
+	awake = true;
+}
+function Reset() {
+	$('#time').val("");
+	$('#start').val("");
+	$('#rate').val("");
+}
+</script>
+
+</body>
+
+</html>

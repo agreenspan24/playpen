@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>2017 Nissan Altima</title>
+<style type="text/css">
+	body{
+		background-color: #588ebb;
+		color: white;
+		text-align: center;
+		margin-left: 10%;
+		margin-right: 10%;
+	}
+	#container {
+		display: block;
+	}
+	.image {
+		display: inline;
+		background-color: #000000;
+		position: relative;
+		text-align: center;
+		width: 50%;
+		height: 240px;
+		overflow: hidden;
+	}
+	.image-left {
+		float: left;
+	}
+	.image-right {
+		float: right;
+	}
+	img {
+		height: 100%;
+		width: auto;
+		left: 0px;
+		position: relative;
+	}
+	h2 {
+		display: none;
+	}
+	.image:hover img{
+		opacity: .5;
+		-webkit-filter: blur(3px);
+		filter: blur(3px);
+		transition-duration: 500ms;
+	}
+	.image:hover h2 {
+		display: inline;
+		position: absolute;
+		top: 40%;
+	    left: 4vw;
+	    right: 4vw; 
+	    width: calc(100%-8vw);
+	    color: #cccccc;
+		transition-duration: 500ms;
+	}
+	#altima {
+	}
+	#maxima {
+
+	}
+	#sentra {
+		left: -20px;
+	}
+	#murano {
+		height: 100%;
+		width: auto;
+		left: -40px;
+	}
+</style>
+</head>
+<body>
+<h1>2017 Nissan Line-up</h1>
+<h3>Get a brand new Nissan in 2017, starting at just $19,999</h3>
+<div id="container">
+<div class="image image-left">
+	<img id="altima" src="altima.jpg" alt="altima"/>
+	<h2>Altima</h2>
+</div>
+<div class="image image-right">
+	<img id="maxima" src="maxima.jpg" alt="maxima"/>
+	<h2>Maxima</h2>
+</div>
+<div class="image image-left">
+	<img id="sentra" src="sentra.jpg" alt="sentra"/>
+	<h2>Sentra</h2>
+</div>
+<div class="image image-right">
+	<img id="murano" src="murano.jpg" alt="murano"/>
+	<h2>Murano</h2>
+</div>
+</div><br><br>
+<p>Call: (123) 456-7890</p>
+</body>
+</html>

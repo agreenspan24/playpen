@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dots</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js">
+</script>
+<style>
+    body {
+        text-align: center;
+    }
+    table.center {
+        margin-left: auto; 
+        margin-right: auto;
+    }
+    caption {
+        font-size: 15pt;
+    }
+    span {
+        color: red; 
+    }
+    tbody {
+        font-size: 40pt;
+    }
+    .highlighted {
+        background-color: yellow;
+    }
+    ol {
+        display: inline-block;
+        margin-left: -2%;
+    }
+</style>
+<script>
+    var squareLength = 6;
+    var intervalLeft = 35;
+    var intervalTop = 69;
+    var colors = ["#f90505", "#ff7d26", "#03e1af", "#2f8df6", "#f451e5"];
+    var board;
+
+    var movesLeft;
+    var points;
+    var shrinkers;
+
+    var firstClick = {dot: "", top: 0, left: 0, color: ""};
+    var last = {left: 0, top: 0};
+    var clickDown = false;
+    var dotArray = [];
+
+    var leaderboard = [];
+    var leaderboardLength = 3;
+
+    function init() {
+        var x = getCookie("leaders");
+
+        if (x){
+            leaderboard = x.split(',');
+        }
+        leaders();
+
+        $("#start").show();
+        $("table").hide();
+        $("#finish").hide();
+        $("#leaderboard").show();
+    }
+
+    function start() {
+        movesLeft = 30;
+        points = 0;
+        shrinkers = 2;
+
+        $("#start").hide();
+        $("table").show();
+        $("#finish").hide();
+        $("#leaderboard").hide();
+        startBoard();
+        buildTable();
+        $("#movesLeft").html(movesLeft);
+        $("#points").html(points);
+        $("#shrinkers").html(shrinkers);
+    }
+
+    function startBoard() {
+        board = [];
+        for (var i = 0; i < squareLength; i++){
+            board[i] = [];
+            for (var j = 0; j < squareLength; j++){
+                var c = Math.floor(Math.random() * 100) % colors.length;
+                var id = "r"+i+"d"+j+"c"+c;
+                board[i][j] = {id: id, c: c};
+            }
+        }
+    }
+    
+    function buildTable() {
+        var tableString = "";
+        for (var i = 0; i < squareLength; i++){
+            tableString += "<tr>";
+            for (var j = 0; j < squareLength; j++){
+                tableString += "<td id="+ board[i][j].id +" style='color:" + colors[board[i][j].c] + "'>&#9679;</td>";
+            }
+            tableString += "</tr>"
+        }
+        $("tbody").html(tableString);
+    }
+
+
+    function clear() {
+        firstClick = {dot: "", top: 0, left: 0, color: ""};
+        last = {left: 0, top: 0};
+        clickDown = false;
+        dotArray = [];
+    }
+
+    function reset() {
+        var newBoard = [];
+        var dots = [];
+
+        dotArray.forEach(function (elem){
+            dots.push({r: elem[elem.indexOf("r") + 1], 
+                d: elem[elem.indexOf("d") + 1],
+                c: elem[elem.indexOf("c") + 1]});
+        });
+
+        for (var i = 0; i < squareLength; i++){
+            newBoard[i] = [];
+            for (var j = 0; j < squareLength; j++){
+                newBoard[i][j] = null;
+            }
+        }
+
+        for (var j = 0; j < squareLength; j++){
+            var levels = [];
+            dots.forEach(function (dot){
+                if (dot.d == j){
+                    levels.push(dot.r);
+                }
+            });
+            levels.sort();
+
+            if (levels.length > 0){
+                var x = squareLength-1;
+                for (var i = squareLength-1; i >= 0; --i){
+                    if (levels.indexOf(i.toString()) == -1){
+                        var id = "r"+x+"d"+j+"c"+board[i][j].c;
+                        newBoard[x][j] = {id: id, c: board[i][j].c};
+                        --x;
+                    }
+                }
+                for (var i = 0; i < levels.length; i++){
+                    var c = Math.floor(Math.random() * 100) % colors.length;
+                    var id = "r"+i+"d"+j+"c"+c;
+                    newBoard[i][j] = {id: id, c: c};
+                }
+                
+            } else {
+                for (var i = 0; i < squareLength; i++){
+                    newBoard[i][j] = board[i][j];
+                }
+            }
+        }
+        board = newBoard;
+        buildTable();
+    }
+
+    function clearColor(cIndex) {
+        dotArray = [];
+        for (var i = 0; i < squareLength; i++){
+            for (var j = 0; j < squareLength; j++){
+                if (board[i][j].c = cIndex){
+                    dotArray.push(board[i][j].id);
+                }
+            }
+        }
+    }
+
+    function finish() {
+        $("table").hide();
+
+        leaderboard.push(points);
+        leaderboard = leaderboard.slice(0,leaderboardLength);
+        leaderboard.sort(function (a,b) {
+            return a < b;
+        });
+
+
+        setCookie("leaders", leaderboard.toString(), 5);
+        leaders();
+
+        $("#finish").show();
+        $("#leaderboard").show();
+    }
+
+    function leaders() {
+        var leaderboardString = "";
+        for (var i = 0; i < leaderboard.length; i++){
+            leaderboardString += "<li>" + leaderboard[i] + "</li>";
+        }
+
+        $("#leaderboard").html(leaderboardString);
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+        document.cookie = "username=John Smith; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/";
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+d.toUTCString();
+        console.log(cvalue);
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+        console.log(document.cookie);
+    }
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    $(document).ready(function(){
+        init();
+
+        $("td").live("mousedown" , function(){
+            firstClick.dot = $(this)
+            firstClick.left = $(this).offset().left;
+            firstClick.top = $(this).offset().top;
+            firstClick.color = $(this).css("color");
+            last.left = firstClick.left;
+            last.top = firstClick.top;
+            clickDown = true;
+            dotArray.push($(this).attr("id"));
+        });
+        $(document).mouseup(function(){
+            if (dotArray.length > 1){
+                movesLeft--;
+                points += dotArray.length;
+                $("#movesLeft").html(movesLeft);
+                $("#points").html(points);
+
+                if (movesLeft == 0){
+                    finish();
+                } else {
+                    reset();
+                }
+            }
+            clear();
+        });
+        $("td").live("mouseover", function(){
+            if (clickDown){
+                if (Math.abs($(this).offset().left - last.left) == intervalLeft &&
+                    $(this).offset().top - last.top == 0 &&
+                    $(this).css("color") == firstClick.color &&
+                    dotArray.indexOf($(this).attr("id")) == -1){
+                    $(this).addClass("highlighted");
+                    last.left = $(this).offset().left;
+                    firstClick.dot.addClass("highlighted");
+                    dotArray.push($(this).attr("id"));
+                }
+                else if (Math.abs($(this).offset().top - last.top) == intervalTop &&
+                    $(this).offset().left - last.left == 0 &&
+                    $(this).css("color") == firstClick.color &&
+                    dotArray.indexOf($(this).attr("id")) == -1){
+                    $(this).addClass("highlighted");
+                    last.top = $(this).offset().top;
+                    firstClick.dot.addClass("highlighted");
+                    dotArray.push($(this).attr("id"));
+                }
+            }
+        });
+        $("td").live("dblclick", function(){
+            if (shrinkers > 0){
+                dotArray.push($(this).attr("id"));
+                --shrinkers;
+                movesLeft--;
+                points += dotArray.length;
+                $("#movesLeft").html(movesLeft);
+                $("#points").html(points);
+                $("#shrinkers").html(shrinkers);
+
+                if (movesLeft == 0){
+                    finish();
+                } else {
+                    reset();
+                }
+            }
+            clear();
+        });
+    });
+</script>
+</head>
+<body>
+<h1>Welcome to Dots!</h1>
+
+<button id="start" onclick = "start()">Start Playing</button>
+<table class = "center">
+    <caption align = "top">
+        Moves Left: <span id="movesLeft" ></span>
+        Points: <span id="points"></span>
+     </caption>
+    <tbody></tbody>
+    <caption align = "bottom">Shrinkers: <span id="shrinkers" ></span></caption>
+</table>
+<button id="finish" onclick="start()">Start Over?</button><br>
+<ol id="leaderboard"></ol>
+</body>
+</html>

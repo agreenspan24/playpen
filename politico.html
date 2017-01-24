@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Politico</title>
+ <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+ <link href="Murph/css/font-awesome.css" rel="stylesheet" type="text/css">
+ <link href="Murph/css/bootstrap-social.css" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+$(document).ready(function(){
+    
+    var getMax = function(){
+        return $(document).height() - $(window).height();
+    }
+    
+    var getValue = function(){
+        return $(window).scrollTop();
+    }
+    
+    if('max' in document.createElement('progress')){
+        // Browser supports progress element
+        var progressBar = $('progress');
+        
+        // Set the Max attr for the first time
+        progressBar.attr({ max: getMax() });
+
+        $(document).on('scroll', function(){
+            // On scroll only Value attr needs to be calculated
+            progressBar.attr({ value: getValue() });
+        });
+      
+        $(window).resize(function(){
+            // On resize, both Max/Value attr needs to be calculated
+            progressBar.attr({ max: getMax(), value: getValue() });
+        });   
+    }
+    else {
+        var progressBar = $('.progress-bar'), 
+            max = getMax(), 
+            value, width;
+        
+        var getWidth = function(){
+            // Calculate width in percentage
+            value = getValue();            
+            width = (value/max) * 100;
+            width = width + '%';
+            return width;
+        }
+        
+        var setWidth = function(){
+            progressBar.css({ width: getWidth() });
+        }
+        
+        $(document).on('scroll', setWidth);
+        $(window).on('resize', function(){
+            // Need to reset the Max attr
+            max = getMax();
+            setWidth();
+        });
+    }
+});
+</script>
+<style>
+progress {
+  /* Positioning */
+  position: fixed;
+  left: 0;
+  bottom: 0;
+
+  /* Dimensions */
+  width: 100%;
+  height: 1em;
+
+  /* Reset the apperance */  
+  -webkit-appearance: none; 
+}
+
+.progress-container {
+  width: 100%;
+  background-color: transparent;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  display: block;
+}
+.progress-bar {
+  width: 0%;
+  display: block;
+  height: inherit;
+}
+body {
+  margin-right: 20px;
+  margin-left: 20px;
+  margin-bottom: 2em;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-size: 30pt;
+  font-weight: bold;
+}
+h2 {
+  font-size: 16pt;
+}
+h3 {
+  text-align: center;
+  font-size: 16pt;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+h4 {
+  text-align: center;
+  color: gray;
+  font-size: 12pt;
+}
+p {
+  font-size: 13pt;
+}
+img {
+  max-width: 100%;
+  text-align: center;
+}
+label {
+  margin-top: 15px;
+  margin-bottom: 0px;
+  color: gray;
+  font-weight: normal;
+}
+.navbar {
+  background-color: #b20000;
+}
+#text {
+  margin-right: 30%;
+}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#" style="color:white">POLITICO</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">     
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">Magazine <span class="caret"></span></a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">2016 Election <span class="caret"></span></a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">Policy <span class="caret"></span></a>
+        </li>
+        <li><a href="#" style="color:white">Pro</a></li>
+        <li><a href="#" style="color:white;font-size:26pt">&#128270</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">U.S. Edition <span class="caret"></span></a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<progress value="0" id="progressBar">
+  <div class="progress-container">
+    <span class="progress-bar"></span>
+  </div>
+</progress>
+<h4 style="color:#b20000">2016</h4>
+<h1>Clinton's tech team stumbles toward Trump</h1>
+<h3>After struggling to put Sanders away, the Dems' digital and data all-stars plot attack on low-tech Trump.</h3>
+<h4>By <b>ADAM GREENSPAN</b> | 05/19/16 09:25 PM</h4>
+
+<img src="http://static2.politico.com/dims4/default/bea9a89/2147483647/resize/1160x%3E/quality/90/?url=http%3A%2F%2Fstatic.politico.com%2F3e%2F94%2Fc9d4a7db4a6cb731b8701cbd106a%2F160518-hillary-clinton-1160-ap.jpg" alt="160518_hillary_clinton_1160_ap.jpg" title="img">
+<label>Hillary Clinton's tech team has conceded it was caught off guard by Bernie Sanders' operation. | AP Photo</label>
+
+<hr>
+<a class="btn btn-social-icon btn-facebook" href="#">
+  <span class="fa fa-facebook"></span>
+</a>
+  <a class="btn btn-social-icon btn-twitter" href="#">
+  <span class="fa fa-twitter"></span>
+</a>
+<hr>
+<div id="text">
+<p>NEW YORK - Hillary Clinton built her 2016 campaign around the Democratic Party's most vaunted data geeks and online gurus, boasting of plans to "create the next big thing" in digital politics.</p>
+<p>But after failing to deliver the resounding win she wanted against Bernie Sanders, some Democrats are warning the Brooklyn boiler room against overconfidence in the matchup with Donald Trump's decidedly low-tech campaign.</p>
+<p>In a series of interviews at the campaign's New York headquarters, Clinton's tech team conceded it was caught off-guard by Sanders, whose enterprise started miles behind in money and organization but has bested the front-runner at nearly every turn.</p>
+<p>The Vermont senator has been far more adept at going viral: His 10 most popular Web videos have nearly 3.1 million more views on You Tube than Clinton's similarly highest-rated offerings. His army of volunteer coders has pumped out new apps by the dozen to help his supporters get to the polls in a series of late-cycle primaries and caucuses. And it is Sanders who has built this campaign seasons's most coveted list of millions of names and email addresses of small-dollar donors, a group of supporters who has helped keep his bank account flush with cash and allowed him to hold on much deeper into a primary season that was widely predicted to yield a Clinton coronation before spring.</p>
+<p>Teddy Goff, top strategist for Clinton's tech operation, acknowledged his team had been beaten by Sanders on the digital front, pegging that success to the underdog's relentless focus on animating small-dollar donors. "They did a great job reinforcing their message about the importance of small donors in every last email, tweet, post."</p>
+<p>Sanders' digital successes have been significant enough to give techies in both parties pause as they assess whether Clinton can effectively exploit the party's data and digital advantage when she faces Trump in the general election. After all, the billionaire and presumptive GOP nominee who dismisses data-savvy campaigning as "overrated," has proved more capable than any other 2016 contender of dominating the digital space with a single tweet.
+"Democrats who think we are superior on digital and are resting on their 2008 laurels are making a giant mistake," said Scott Goodstein, an Obama campaign veteran and the CEO of Revolution Messaging, the D.C.-based consulting firm that's helped propel Sanders' digital campaign.</p>
+<p>Arun Chaudhary, another Obama alumnus now serving as Sanders' digital creative director, said Clinton's "lack of excitement online is a harbinger of a much bigger problem."</p>
+
+<hr>
+<img src="http://static.politico.com/45/a7/d5cc1dbb4c6c9a8b53498580df89/05-hillary-clinton-18-ap-1160.jpg" height="49px" style="position:absolute"id="linked">
+<div style="position:relative;left:100px;font-size:9pt"><span style="color:#b20000">2016</span><br>
+<a href="#" style="color:black;font-size:14pt;font-weight:bold">Clinton campaign wrestles with how to attack Trump</a><br>
+<span style="color:gray">By <b>ANNIE KARNI</b></span></div>
+<hr>
+
+<p>Indeed, Clinton's tech effort, now more than a year in the making, has been anything but a smooth ride. She started off the cycle with plenty of her own baggage, from her self-described "mistake" in using a private email server during her tenure running the Obama State Department to the reputation her 2008 White House campaign earned as incapable of harnessing digital innovations.</p>
+<p>Heading into 2016, Clinton tried to counter her analog image by building a tech team pulled from Barack Obama's ranks as well as private firms, including Facebook and Google. Leading her effort is Goff, an Obama campaign veteran who helped raised more than $690 million for the president's reelection and built a social network of followers for the president in the tens of millions; Elan Kriegel, a former NCAA Division III football player and Obama 2012 battleground states director now running Clinton's data analytics department; and Stephanie Hannon, a former Google executive in her first presidential campaign who is charged with managing a team of 40-plus engineers and software developers.</p>
+<p>But bold-faced names aside, Clinton still has had a difficult time generating anywhere near the degree of online enthusiasm as Sanders. Critics and even some of her supporters chalk up her shortcomings to her status as an establishment candidate tied to a sitting two-term president running in a year of outsiders. While a sophisticated data operation and a smart digital team can help make a difference in a close election by connecting with more voters, volunteers and donors, those tech tools can't mask every candidate flaw. And even the best tech operation will struggle to compensate for entrenched opinions many voters have of Clinton after a decadeslong career in the national spotlight.</p>
+<p>"It's hard when you're selling RC Cola and presenting it as Coke," said Zac Moffatt, digital director for Mitt Romney's 2012 presidential campaign.</p>
+<h2>DIGITAL DRIVERS</h2>
+<p>Many of the most publicized tech innovations this cycle come from Sanders' campaign volunteers, who rarely meet in person but stay connected via the group messaging site Slack. The website voteforbernie.org, for example, was built by a single father in southern Oregon and remains the top search engine result not just for people looking to support the senator but also for anyone who Googles "how to vote in the Democratic primaries."</p>
+<p>Goff said many of the new Sanders campaign apps gained as much traction as they did in 2016 not because they were big new innovations but because of whom the Sanders campaign was appealing to. "What he's done is produce a base of people who want to use those tools," Goff said.</p>
+<p>The Sanders campaign's email list also stands out as a 2016 crown jewel for many of Clinton's friends on the left who covet this new database of millions of supporters willing to both volunteer and donate small amounts of money, often on more than one occasion. "I can think of a lot of possibilities," Senate Minority Whip Dick Durbin (D-Ill.) told POLITICO.</p>
+<p>Clinton's tech team remains awed by Sanders' ability to tap online a vein of spirited small-dollar donors who, through the latest Federal Election Commission filings in April, had given him about $83 million more than the amount she raised from people giving $200 or less.</p>
+<p>"If we could have raised this much money as Bernie Sanders, that would be great," said Jenna Lowenstein, the Clinton campaign's digital director. "We have absolutely admired the work that they've done in building an enormous army of grass-roots donors."</p>
+<p>While insisting Clinton's campaign had done a "pretty good job too" with small-dollar donors, Lowenstein conceded: "The numbers say that there's more for us to learn."
+Still, Clinton's tech staffers said they don't plan to directly tap into the senator's network after he's out of the primary race.</p>
+<p>"There's lots of data that shows rented lists and uploaded lists are of much greatly reduced value relative to people just taking it upon themselves to sign up," Goff said, arguing that Sanders "could email it 20 times saying, ‘Please go support Hillary.' It would help a little but not all that much. These people have to decide they're with us."</p>
+<p>The Clinton aides see better ways to test her message with Sanders' supporters, including matching his list of names and email addresses with their Facebook accounts and then microtargeting ads to those individuals.</p>
+<p>Democrats and Republicans are far from dissing Clinton's tech operation. They praise her campaign for prioritizing online tools so mobile-phone users get the same experience as people clicking on her sites via desktop and laptop computers. She gets credit for her banner ads that target potential supporters as they visit both political and apolitical websites and for taking advantage of email fundraising and list-building opportunities during debates, primary nights and other key moments of the campaign.</p>
+<p>On Wednesday, for example, just after splitting wins with Sanders in Oregon and Kentucky, Clinton sent an email seeking $1 donations as she stays "focused on closing out this primary while also fighting on a second front" against Trump. At Clinton campaign rallies, introductory speakers frequently ask attendees to take out their phones and send a quick text message to her team. While this may seem like a throwaway moment, Clinton is doing something GOP rivals have this cycle too — collecting another layer of data about her supporters.</p>
+<p>"Everything they do from a block-and-tackle perspective always seems to be very sophisticated and done very well," said Moffatt, who described the Clinton tech effort as "iteration three of the Obama campaign."</p>
+<p>But compared with Sanders' digital success, the Clinton team's results are seen by tech experts as unimpressive.</p>
+<p>"It's what you would have expected," said Faiz Shakir, digital director for Senate Minority Leader Harry Reid (D-Nev.), who described the Clinton tech operation as "conventional" for a presidential campaign. "It's not terribly outside any particular box."</p>
+<h2>TRUMP'S TURN</h2>
+<p>As the presumptive nominee throughout the primary season, Clinton's team has been cautious about publicizing what it has done on the tech front. It's a common move in campaign tech circles for fear of tipping off opponents. "Some of the best stuff, the most impactful stuff, we just won't talk about until November," Hannon said.</p>
+<p>But on a recent tour of the campaign's Brooklyn headquarters, Clinton aides offered some insights on what they've been up to. A computer monitor stationed at the end of a row of cubicles a few steps from the office's lobby tracks Web traffic and the pace of online donations. Last week, the campaign posted a picture of Clinton getting a demonstration as aides explained she'd gotten a big spike on her website during her mid-March victory speech in Florida, just by mentioning the hillaryclinton.com address.</p>
+<p>Once she officially wraps up her party's presidential nomination, Clinton will get complete access to the Democratic National Committee's rich trove of personal information about voters. The database, built off the particulars of Obama's two White House wins, is something her team is intimately familiar with in no small part because some of them helped build it.</p>
+<p>A new mobile-friendly Clinton campaign app is also near completion that will be of use both to the general public and her volunteer army. Tools will be rolled out too to help people find out how to register to vote and, come November, to find their polling places.</p>
+<p>The tech team will expand as it gets ready for a general election against Trump. Goff said he expects a budget and a staff of equal or even slightly smaller size compared with what he had for the Obama 2012 campaign — somewhere around 275 digital and technology aides at headquarters and spread out in battleground states.</p>
+<p>Kyle Rush, director of Clinton's engineering and optimization efforts, recently boasted on Twitter that the campaign had hired six new software engineers since the billionaire became the presumptive GOP nominee.</p>
+<p>It's all an effort to make Trump into a boogeyman; indeed, that's the primary function of the Clinton tech team. Already, he has become the star of her Twitter feed, her online videos and on her most prominent piece of campaign real estate — the top of her website hawks $5 "Love trumps hate" bumper stickers.</p>
+<p>"He will make the doing of my job a whole lot easier," Goff said in an interview on the same day that Trump's taco bowl lunch was the talk of the nation and only minutes after House Speaker Paul Ryan had gone on national television saying he was still unwilling to endorse the Republicans' likely presidential nominee.</p>
+<p>"There can be no doubt that he is good at Twitter in a sense that his tweets get a lot of attention," Goff said. But if Trump doesn't moderate his tone on social media, Goff said he expects a backlash that comes from well beyond the Republican billionaire's more than 8.2 million followers.</p>
+<p>Trump last week gave one signal of how technical he expects to be in the general election, telling The Associated Press he thinks a data-based ground game is "overrated." But it's still far from clear whether the Republican really will be so shorthanded in this department come November. After all, Trump defeated Ted Cruz and several other Republicans who were considered to have far savvier data operations, including Marco Rubio and Scott Walker. At least one pro-Trump super PAC has said it plans to raise tens of millions of dollars to focus on collecting voter data and other get out the vote efforts. And a senior GOP technology source said the Republican National Committee has been "planning from Day 1" to supply its ultimate presidential nominee with some deep-pocketed data and digital help.
+Democrats and Republicans say the Clinton tech team shouldn't underestimate Trump on the data front and it also would be smart not to engage directly with the celebrity-turned-politician on social media.</p>
+<p>"They're playing right into Trump's hands making this all about Trump," Chaudhary said. "You can't just be an anti-Trump candidate and win an election, especially when you have headwinds of being the third term of your party. To just be the anti-Trump is not going to be enough."</p>
+<p>Chris Wilson, who ran the data analytics and polling department for the Cruz campaign, said it'd be a "huge mistake" for Clinton "to just dismissively assume that Trump can't do the same thing in the general election that he did in the primary." But he said Clinton's own primary battle might have served as the perfect wake-up call. "Coming off the experience they had with Sanders probably better prepares them for that, to make sure they don't take [Trump] lightly," he said.</p>
+<p>Clinton's aides said they didn't expect to maintain the same level of Trump-centric social media activity all the way through the general election: for example, four out of their five tweets were hits on Trump during the first 48 hours after he became the presumptive nominee.</p>
+<p>"It could be detrimental for us to just throw things at people all the time," Lowenstein said. "You say something about somebody a hundred times they're going to believe it and accept it and move on. They accept that he's a wild card and we need to be focused on the things that will move people."</p>
+<p>Indeed, Clinton has shifted some since their initial all-Trump digital onslaught. Other parts of her campaign's core message, namely appeals directly to women and families, have started popping up more frequently on her Twitter feed. But those posts are still easily outnumbered by her anti-Trump screeds.</p>
+<p>"He's going to find that the general election Twitter is a lot less friendly to him than Republican primary Twitter," Goff said</p>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+	function init(){
+		$.get( "http://realtime.mbta.com/developer/api/v2/schedulebystop?api_key=wX9NwuHnZU2ToO7GmGR9uw&stop=place-davis&format=json", function( data ) {
+			console.log(data);
+		  var subOutNext = data.mode[0].route[0].direction[0].trip[0].sch_arr_dt;
+		  $("#OutboundNext").html(parseInt((parseInt(subOutNext) - Date.now()/1000)/60));
+
+		  var subOutTrips = [];
+		  for (var i = 0; i < data.mode[0].route[0].direction[0].trip.length; i++){
+		  	var dt = data.mode[0].route[0].direction[0].trip[i].sch_arr_dt;
+		  	var d = new Date(parseInt(dt * 1000));
+		  	var isPm = d.getHours() >= 12;
+		  	subOutTrips.push({"arr": parseInt(dt), "p" : (isPm ? d.getHours() - 12 : d.getHours()) + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes() + (isPm ? " PM" : " AM") + " -- Alewife"});
+		  }
+		  console.log(subOutTrips);
+		  subOutTrips.sort(function(a,b) {return a.arr - b.arr;});
+		  var str = "";
+		  for (var i = 0; i < subOutTrips.length; i++) {
+		  	str += subOutTrips[i].p + "<br>";
+		  }
+		  $("#OutboundSchedule").html(str);
+
+		  if (data.mode[0].route[0].direction[1] == null) {
+		  	$("#InboundNext").html("-1");
+		  	return;
+		  }
+		  var subInNext = data.mode[0].route[0].direction[1].trip[0].sch_arr_dt;
+		  $("#InboundNext").html(parseInt((parseInt(subInNext) - Date.now()/1000)/60));
+
+		  var subInTrips = [];
+		  for (var i = 0; i < data.mode[0].route[0].direction[1].trip.length; i++){
+		  	var dt = data.mode[0].route[0].direction[1].trip[i].sch_arr_dt;
+		  	console.log(dt);
+		  	var tn = data.mode[0].route[0].direction[1].trip[i].trip_name;
+		  	var d = new Date(parseInt(dt * 1000));
+		  	var isPm = d.getHours() > 12;
+		  	subInTrips.push({"arr": dt, "p" : (isPm ? d.getHours() - 12 : d.getHours()) + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes() + (isPm ? " PM" : " AM") + " -- " + (tn.includes("Braintree") ? "Braintree" : "Ashmont")});
+		  }
+		  subInTrips.sort(function(a,b) {return a.arr - b.arr;});
+		  var str = "";
+		  for (var i = 0; i < subInTrips.length; i++) {
+		  	str += subInTrips[i].p + "<br>";
+		  }
+		  $("#InboundSchedule").html(str);
+
+		  if (data.mode[1].route[2] == null) {
+		  	$("#InboundNext").html("-1");
+		  	return;
+		  }
+		  var subInNext = max(data.mode[1].route[2].direction[0].trip[0].sch_arr_dt;
+		  $("#InboundNext").html(parseInt((parseInt(subInNext) - Date.now()/1000)/60));
+
+		  var subInTrips = [];
+		  for (var i = 0; i < data.mode[0].route[0].direction[1].trip.length; i++){
+		  	var dt = data.mode[0].route[0].direction[1].trip[i].sch_arr_dt;
+		  	console.log(dt);
+		  	var tn = data.mode[0].route[0].direction[1].trip[i].trip_name;
+		  	var d = new Date(parseInt(dt * 1000));
+		  	var isPm = d.getHours() > 12;
+		  	subInTrips.push({"arr": dt, "p" : (isPm ? d.getHours() - 12 : d.getHours()) + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes() + (isPm ? " PM" : " AM") + " -- " + (tn.includes("Braintree") ? "Braintree" : "Ashmont")});
+		  }
+		  subInTrips.sort(function(a,b) {return a.arr - b.arr;});
+		  var str = "";
+		  for (var i = 0; i < subInTrips.length; i++) {
+		  	str += subInTrips[i].p + "<br>";
+		  }
+		  $("#InboundSchedule").html(str);
+
+
+		});
+	}
+</script>
+</head>
+<body onload="init()">
+<h1>Welcome to Davis T tracker</h1>
+<h2>Subway</h2>
+<h3>Outbound</h3>
+<p>Next train in <span id="OutboundNext"></span> minutes</p>
+<p id="OutboundSchedule"></p>
+<h3>Inbound</h3>
+<p>Next train in <span id="InboundNext"></span> minutes</p>
+<p id="InboundSchedule"></p>
+<h2>Bus</h2>
+<h3>94</h3>
+<p>Next bus in <span id="94Next"></span> minutes</p>
+<p id="94Schedule"></p>
+<h3>96</h3>
+<p>Next bus in <spain id"96Next"></span> minutes</p>
+<p id="96Schedule"></p>
+</body>
+</html>
