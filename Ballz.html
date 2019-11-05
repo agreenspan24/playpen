@@ -1,0 +1,406 @@
+<html>
+<head>
+	<style>
+		body {
+			background-color: #dddddd;
+			text-align: center;
+		}
+
+		ul {
+			padding: 0 calc(50% - 175px);
+			text-align: left;
+		}
+
+		canvas {
+			border: solid 5px;
+			background-color: white;
+		}
+	</style>
+
+	<script>
+		var canvasHeight = window.innerHeight * .8;
+		var canvasWidth = canvasHeight / 1.5;
+
+		if (canvasWidth >= window.innerWidth * .8) {
+			canvasWidth = window.innerWidth * .8;
+			canvasHeight = canvasWidth * 1.5
+		}
+
+		var countAcross = 7;
+		var padding = canvasWidth / 70;
+
+		var blockSize = (canvasWidth - padding) / countAcross - padding;
+		var blockColor = 'green';
+
+		var ballSize = blockSize / 5;
+		var ballColor = 'red';
+		var ballSpeed = blockSize / 3;
+		var staticBallColor = '#f88';
+
+		var game = {
+		    canvas: document.createElement('canvas'),
+		    activeBalls: [],
+		    activeBlocks: [],
+		    staticBall: null,
+		    ballCount: 0,
+		    mouseDown: false,
+		    init: function () {
+				// Create canvas
+		    	this.canvas.width = canvasWidth;
+		    	this.canvas.height = canvasHeight;
+		        this.context = this.canvas.getContext("2d");
+
+		        document.getElementById('ballz-canvas-container').appendChild(this.canvas);
+
+		        // Attach event handlers
+		        this.canvas.addEventListener('mousedown', this.onMouseDown);
+		        this.canvas.addEventListener('touchstart', this.onMouseDown);
+		        this.canvas.addEventListener('mousemove', this.onMouseMove);
+		        this.canvas.addEventListener('touchmove', this.onMouseMove);
+		        this.canvas.addEventListener('mouseup', this.launchBalls);
+		        this.canvas.addEventListener('touchend', this.launchBalls);
+
+		        this.restart();
+
+		        // Create animator
+		        this.interval = setInterval(this.updateGame, 20);
+		    },
+		    restart: function() {
+		    	this.activeBalls = [];
+		    	this.activeBlocks = [];
+		    	this.staticBall = [];
+
+		    	this.ballCount = 0;
+			    document.getElementById('ball-count').innerText = this.ballCount;
+
+			    if (this.launchInterval) {
+			    	clearInterval(this.launchInterval);
+			    }
+
+			    this.finishTurn();
+			    this.staticBall = new staticBall(this.canvas.width / 2, this.canvas.height - ballSize, ballSize);
+		    },
+		    updateGame: function () {
+			    game.clear();
+
+			    game.activeBlocks.forEach(function (x) { x.update(); });
+
+		    	if (game.staticBall.x) {
+			    	game.staticBall.update();
+		    	}
+
+		    	game.activeBalls.forEach(function (x) { x.update(); });  
+			},
+		    clear: function () {
+		        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		    },
+		    finishTurn: function () {
+		    	this.ballCount++;
+		    	document.getElementById('ball-count').innerText = this.ballCount;
+
+		    	// Add new blocks
+		    	this.addBlockRow();
+
+	    		var distanceDownRemaining = blockSize + padding;
+		    	// Transform blocks down 
+		    	var interval = setInterval(function () {
+		    		if (distanceDownRemaining >= 0) {
+		    			game.activeBlocks.forEach(function (b) {
+				    		b.y += 2;
+				    	});
+				    	distanceDownRemaining -= 2;
+		    		} else {
+		    			clearInterval(interval);
+
+				    	// Check to see if any blocks hit bottom
+				    	if (game.activeBlocks.some(function (b) { return b.bottom() > (game.canvas.height - ballSize * 2); })) {
+				    		window.alert('You lose :-(');
+				    		game.restart();
+				    		return;
+				    	}
+		    		}
+		    	}, 20);
+		    },
+		    addBlockRow: function () {
+				var odds = Math.floor(Math.random() * 10 % 5) || 2;
+				for (var i = 0; i < 10; i++) {
+			    	if (Math.floor((Math.random() * 10) % odds) == 0){
+				    	var blockLocation = blockSize * i + i * padding + padding;
+
+				    	if (blockLocation + blockSize > canvasWidth) {
+				    		break;
+				    	}
+
+				    	var size = Math.ceil(Math.random() * 10 % 2);
+
+				    	this.activeBlocks.push(new block(blockLocation, 0 - blockSize, this.ballCount * size));
+			    	}
+			    }
+			},
+			onMouseDown: function (e) {
+				e.preventDefault();
+				game.mouseDown = true;
+
+				var pageX = e.pageX || e.touches[0].pageX;
+				var pageY = e.pageY || e.touches[0].pageY;
+
+				game.staticBall.mouseX = pageX - game.canvas.offsetLeft;
+				game.staticBall.mouseY = pageY - game.canvas.offsetTop;
+			},
+			onMouseMove: function (e) {
+				e.preventDefault();
+				if (game.mouseDown) {
+					var pageX = e.pageX || e.touches[0].pageX;
+					var pageY = e.pageY || e.touches[0].pageY;
+
+					game.staticBall.mouseX = pageX - game.canvas.offsetLeft;
+					game.staticBall.mouseY = pageY - game.canvas.offsetTop;
+				}
+			},
+			launchBalls: function (e) {
+				e.preventDefault();
+
+				game.mouseDown = false;
+
+				if (game.activeBalls.length) {
+					return;
+				}
+
+				var b = game.staticBall;
+				var dx = b.mouseX - b.x;
+				var dy = b.mouseY - b.y;
+
+				b.mouseX = null;
+				b.mouseY = null;
+
+				var count = game.ballCount;
+				var launchPoint = game.staticBall.x;
+
+				function launchBall() {
+			    	if (count <= 0) {
+			    		clearInterval(game.launchInterval);
+			    		return;
+			    	}
+
+	    			game.staticBall.x = null;
+			    	game.activeBalls.push(new ball(count, ballColor, launchPoint, game.canvas.height - ballSize, dx, dy));
+
+			    	--count;
+			    	document.getElementById('ball-count').innerText = count;
+			    }
+
+			    launchBall();
+			    game.launchInterval = setInterval(launchBall, 200);
+			}
+		}
+
+		function block(x, y, count) {
+		    this.size = blockSize;
+		    this.x = x;
+		    this.y = y;    
+		    this.count = count;
+		    this.moving = false;
+
+			this.left = function () {
+		    	return this.x;
+		    }
+		    this.right = function () {
+		    	return this.x + this.size;
+		    }
+		    this.top = function () {
+		    	return this.y;
+		    }
+		    this.bottom = function () {
+		    	return this.y + this.size;
+		    }
+
+		    this.update = function() {
+		        ctx = game.context;
+				ctx.beginPath();
+
+		        ctx.fillStyle = blockColor;
+	        	ctx.fillRect(this.x, this.y, this.size, this.size);
+
+				ctx.textAlign="center"; 
+				ctx.textBaseline = "middle";
+				ctx.fillStyle = 'white';
+				ctx.font = (this.size * .6).toString() + 'px Arial';
+				ctx.fillText(this.count, this.x + this.size/2, this.y + this.size/2);
+
+		        ctx.closePath();
+		        ctx.fill();
+		    } 
+		}
+
+		function ball(id, color, x, y, da, db) {
+			this.id = id;
+		    this.radius = ballSize;  
+		    this.x = x;
+		    this.y = y; 
+
+		    var ratio = db / da;
+		    var flipDirection = da < 1 ? -1 : 1;
+		    var speedRatio = 1 + Math.pow(ratio, 2);
+		    var dxAbs = Math.sqrt(Math.pow(ballSpeed, 2) / speedRatio);
+
+		    this.dx = dxAbs * flipDirection;
+		    this.dy = this.dx * ratio;
+
+		    this.left = function (isProj) {
+		    	return this.x - this.radius + (isProj ? this.dx : 0);
+		    }
+		    this.right = function (isProj) {
+		    	return this.x + this.radius + (isProj ? this.dx : 0);
+		    }
+		    this.top = function (isProj) {
+		    	return this.y - this.radius + (isProj ? this.dy : 0);
+		    }
+		    this.bottom = function (isProj) {
+		    	return this.y + this.radius + (isProj ? this.dy : 0);
+		    }
+
+		    this.update = function() {
+		        ctx = game.context;
+				ctx.beginPath();
+		        ctx.fillStyle = color;
+
+		        this.setNewPos();
+
+	            // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+    			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		        ctx.closePath();
+		        ctx.fill();
+		    }
+
+		    this.setNewPos = function() {
+		    	// If hitting the bottom, remove from board
+		    	if (this.bottom(true) > game.canvas.height) {
+		    		var thisId = this.id;
+		    		var thisCurrentIndex = game.activeBalls.findIndex(function (x) { return x.id == thisId; });
+		    		game.activeBalls.splice(thisCurrentIndex, 1);
+
+		    		if (!game.staticBall.x) {
+		    			game.staticBall.x = this.x;
+		    		}
+
+		    		if (game.activeBalls.length <= 0) {
+		    			game.finishTurn();
+		    		}
+		    	}
+
+	    		// If running into a wall, change direction
+		    	if (this.left(true) < 0 || this.right(true) > game.canvas.width) this.dx =- this.dx;
+				if (this.top(true) < 0) this.dy =- this.dy;
+
+				// If running into a block, change direction
+				for (var i = 0; i < game.activeBlocks.length; i++) {
+					// If projected to overlap with the given block
+					if (this.isOverlapX(game.activeBlocks[i], true) && this.isOverlapY(game.activeBlocks[i], true)) {
+						// If currently overlapping with x, y direction needs to be changed
+						if (this.isOverlapX(game.activeBlocks[i])) this.dy =- this.dy;
+						// If currently overlapping with y, x direction needs to be changed
+						if (this.isOverlapY(game.activeBlocks[i])) this.dx =- this.dx;
+
+						// De-increment count of ball and remove if out of hits
+						--game.activeBlocks[i].count;
+
+						if (game.activeBlocks[i].count <= 0) {
+							game.activeBlocks.splice(i, 1);
+						}
+					}
+				}
+
+				// Update position to new location
+				this.x += this.dx; 
+				this.y += this.dy;      
+		    }
+
+		    this.isOverlapX = function (block, isProj) {
+				return block.left() < this.right(isProj)
+					&& block.right() > this.left(isProj);
+			}
+
+			this.isOverlapY = function (block, isProj) {
+				return block.top() < this.bottom(isProj)
+					&& block.bottom() > this.top(isProj);
+			}
+		}
+
+		function staticBall(x, y, radius) {
+			this.x = x;
+			this.y = y;
+			this.radius = radius;
+			this.lineDashOffset = 1;
+
+			this.update = function() {
+		        ctx = game.context;
+				ctx.beginPath();
+		        ctx.fillStyle = staticBallColor;
+
+	            // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+    			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+		        ctx.closePath();
+		        ctx.fill();
+
+		    	// Add angle line for placeholder ball
+		        if (this.mouseX && this.mouseY) {
+		        	ctx.beginPath();
+
+		        	ctx.setLineDash([0, ballSize * 4]);
+		        	ctx.strokeStyle = staticBallColor;
+		        	ctx.lineDashOffset = -this.lineDashOffset;
+		        	ctx.lineWidth = ballSize * 2;
+		        	ctx.lineCap = 'round';
+		        	ctx.moveTo(this.x, this.y);
+		        	ctx.lineTo(this.mouseX, this.mouseY);
+
+		        	ctx.stroke();
+		        	ctx.restore();
+
+	        		if (this.lineDashOffset == length) {
+	        			this.lineDashOffset = 1;
+	        		} else {
+	        			this.lineDashOffset += ballSize / 6;
+	        		}
+		        }
+		    }
+		}
+
+		function initGame() {
+		    game.init();
+		}
+
+		function restartGame() {
+			game.restart();
+		}
+	</script>
+</head>
+<body onload="initGame();">
+	<h1>Ballz</h1>
+	<div id="ballz-canvas-container"></div>
+	<p>Ball Count: <span id="ball-count"></span></p>
+	<button onclick="restartGame();">Restart</button>
+	<h3>Instructions</h3>
+	<ul>
+		<li>
+			Don't let the blocks reach the bottom!
+		</li>
+		<li>
+			Hit the blocks with your ballz to destroy them
+		</li>
+		<li>
+			To aim, hold down your mouse/finger and drag it in the right direction
+		</li>
+		<li>
+			To fire, release your mouse/finger
+		</li>
+		<li>
+			When all your ballz reach the bottom, all the blocks will shift down
+		</li>
+		<li>
+			If any blocks touch the bottom of the board, the game is over
+		</li>
+	</ul>
+	<p>Created by Adam Greenspan</p>
+</body>
+</html>
